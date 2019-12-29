@@ -1,0 +1,36 @@
+﻿version: "3.7"
+
+services:
+    clickhouse:
+        image: yandex/clickhouse-server:latest
+        ports:
+            - "8123:8123"
+        volumes:
+          - ${WORKING_DIRECTORY:?err}/ClickhouseInit:/docker-entrypoint-initdb.d
+          - ${WORKING_DIRECTORY:?err}/Proto:/var/lib/clickhouse/format_schemas
+
+    aerospikedb:
+        image: aerospike/aerospike-server:4.8.0.1
+        ports:
+            - "3000:3000"
+            - "3001:3001"
+            - "3003:3003"
+        #command: --config-file /opt/aerospike/etc/aerospike.conf
+        #volumes:
+          #- ${WORKING_DIRECTORY:?err}/Aerospike:/opt/aerospike/etc
+
+    aerospikeamc:
+        image: aerospike/amc:4.0.27
+        ports:
+            - "8081:8081"
+
+    redis:
+        image: redis:5.0.7
+        ports:
+            - "6379:6379"
+
+    nats:
+        image: nats:2.1.2
+        ports:
+            - "4222:4222"
+            - "8222:8222"
