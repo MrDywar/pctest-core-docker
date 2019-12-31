@@ -2,7 +2,15 @@
 set -e
 
 clickhouse client -n <<-EOSQL
-    CREATE DATABASE test;
-    CREATE TABLE test.User (ID Int64, Name String, Age Int32 ) ENGINE = MergeTree() PRIMARY KEY ID ORDER BY ID;
-    INSERT INTO test.User VALUES (1, 'Dywar', 33);
+    CREATE DATABASE IF NOT EXISTS test;
+
+    CREATE TABLE IF NOT EXISTS test.User
+    (
+      ID Int64,
+      Name String,
+      Age Int32 
+    ) ENGINE = MergeTree()
+    PRIMARY KEY ID
+    ORDER BY ID;
+
 EOSQL
