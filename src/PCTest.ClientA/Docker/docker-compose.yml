@@ -6,8 +6,8 @@ services:
         ports:
             - "8123:8123"
         volumes:
-          - ${WORKING_DIRECTORY:?err}/ClickhouseInit:/docker-entrypoint-initdb.d
-          - ${WORKING_DIRECTORY:?err}/Proto:/var/lib/clickhouse/format_schemas
+          - ../ContainersData/ClickhouseInit:/docker-entrypoint-initdb.d
+          - ../ContainersData/Proto:/var/lib/clickhouse/format_schemas
 
     aerospikedb:
         image: aerospike/aerospike-server:4.8.0.1
@@ -17,7 +17,7 @@ services:
             - "3003:3003"
         #command: --config-file /opt/aerospike/etc/aerospike.conf
         #volumes:
-          #- ${WORKING_DIRECTORY:?err}/Aerospike:/opt/aerospike/etc
+          #- ../ContainersData/Aerospike:/opt/aerospike/etc
 
     aerospikeamc:
         image: aerospike/amc:4.0.27
