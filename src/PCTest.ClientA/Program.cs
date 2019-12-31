@@ -19,6 +19,7 @@ namespace PCTestClientA
 
             var user = new User() { Id = 1, Name = "Dywar", Age = 33 };
 
+            await ClickhouseWriteMethod(user);
             await ClickhouseReadMethod();
 
             AerospikeWriteMethod(user);
@@ -26,6 +27,25 @@ namespace PCTestClientA
 
             RedisWriteMethod(user);
             NatsPublishMethod(user);
+        }
+
+        private static async Task ClickhouseWriteMethod(User user)
+        {
+            using (var client = new HttpClient { BaseAddress = new Uri($"http://{Config.DOCKER_MACHINE_IP}:8123") })
+            {
+                // clear table.
+                await client.PostAsync("", new StringContent("ALTER TABLE test.User DELETE WHERE 1 = 1"));
+
+                //TODO: fix sql injection in Name property.
+                var request = $"INSERT INTO test.User (ID, Name, Age) VALUES ({user.Id}, '{user.Name}', {user.Age})";
+                var response = await client.PostAsync("", new StringContent(request));
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine(await response.Content.ReadAsStringAsync());
+                    Console.WriteLine("Clickhouse ERROR on write.");
+                }
+            }
         }
 
         private static async Task ClickhouseReadMethod()
