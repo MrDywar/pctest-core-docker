@@ -29,5 +29,22 @@ namespace PCTestCommon
                 return serializer.ReadObject(stream);
             }
         }
+
+        public static byte[] ProtobufSerializer(object obj)
+        {
+            using (var memStream = new MemoryStream())
+            {
+                ProtoBuf.Serializer.Serialize(memStream, obj);
+                return memStream.ToArray();
+            }
+        }
+
+        public static T ProtobufDeserializer<T>(byte[] buffer)
+        {
+            using (var memStream = new MemoryStream(buffer))
+            {
+                return ProtoBuf.Serializer.Deserialize<T>(memStream);
+            }
+        }
     }
 }

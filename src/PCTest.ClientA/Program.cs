@@ -63,7 +63,7 @@ namespace PCTestClientA
 
                     foreach (var user in users)
                     {
-                        Console.WriteLine($"Clickhouse: ID: {user.Id}, Name: {user.Name}, Age:{user.Age}");
+                        Console.WriteLine($"Clickhouse: {user}");
                     }
                 }
             }
@@ -130,7 +130,7 @@ namespace PCTestClientA
         {
             using (var c = new NC.ConnectionFactory().CreateEncodedConnection($"http://{Config.DOCKER_MACHINE_IP}:4222"))
             {
-                c.OnSerialize = PCTestCommon.Serializer.JsonSerializer;
+                c.OnSerialize = PCTestCommon.Serializer.ProtobufSerializer;
 
                 c.Publish("users", user);
             }

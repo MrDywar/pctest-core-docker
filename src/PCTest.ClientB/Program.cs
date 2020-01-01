@@ -23,7 +23,7 @@ namespace PCTestClientB
         {
             using (var c = new NC.ConnectionFactory().CreateEncodedConnection($"http://{Config.DOCKER_MACHINE_IP}:4222"))
             {
-                c.OnDeserialize = Serializer.JsonDeserializer;
+                c.OnDeserialize = Serializer.ProtobufDeserializer<User>;
 
                 EventHandler<NC.EncodedMessageEventArgs> eh = (sender, args) =>
                 {
@@ -31,8 +31,8 @@ namespace PCTestClientB
                     var redisUser = GetUserFromRedis(user.Id.ToString());
 
                     Console.WriteLine(new string('*', 10));
-                    Console.WriteLine($"User from NATS: ID: {user.Id}, Name: {user.Name}, Age:{user.Age}");
-                    Console.WriteLine($"User from REDIS: ID: {redisUser.Id}, Name: {redisUser.Name}, Age:{redisUser.Age}");
+                    Console.WriteLine($"User from NATS: {user}");
+                    Console.WriteLine($"User from REDIS: {redisUser}");
                     Console.WriteLine($"Are users equal: {user.Equals(redisUser)}");
                 };
 
