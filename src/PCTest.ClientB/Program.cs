@@ -14,23 +14,12 @@ namespace PCTestClientB
             Console.WriteLine("Client B");
             Console.WriteLine("Enter any string to exit.");
 
-            RedisReadMethod();
-            NatsReadMethod();
+            NatsSubscribeMethod();
 
             Console.WriteLine("END");
         }
 
-        private static void RedisReadMethod()
-        {
-            var manager = new RedisManagerPool($"{Config.DOCKER_MACHINE_IP}:6379");
-            using (var client = manager.GetClient())
-            {
-                var user = client.Get<User>("foo");
-                Console.WriteLine($"Redis: ID: {user.Id}, Name: {user.Name}, Age:{user.Age}");
-            }
-        }
-
-        private static void NatsReadMethod()
+        private static void NatsSubscribeMethod()
         {
             using (var c = new NC.ConnectionFactory().CreateEncodedConnection($"http://{Config.DOCKER_MACHINE_IP}:4222"))
             {
@@ -39,10 +28,15 @@ namespace PCTestClientB
                 EventHandler<NC.EncodedMessageEventArgs> eh = (sender, args) =>
                 {
                     var user = (User)args.ReceivedObject;
-                    Console.WriteLine($"Nats: ID: {user.Id}, Name: {user.Name}, Age:{user.Age}");
+                    var redisUser = GetUserFromRedis(user.Id.ToString());
+
+                    Console.WriteLine(new string('*', 10));
+                    Console.WriteLine($"User from NATS: ID: {user.Id}, Name: {user.Name}, Age:{user.Age}");
+                    Console.WriteLine($"User from REDIS: ID: {redisUser.Id}, Name: {redisUser.Name}, Age:{redisUser.Age}");
+                    Console.WriteLine($"Are users equal: {user.Equals(redisUser)}");
                 };
 
-                using (var s = c.SubscribeAsync("foo", eh))
+                using (var s = c.SubscribeAsync("users", eh))
                 {
                     Console.WriteLine("Waiting for a message..");
                     Console.WriteLine();
@@ -52,6 +46,15 @@ namespace PCTestClientB
                         Thread.Sleep(100);
                     }
                 }
+            }
+        }
+
+        private static User GetUserFromRedis(string userId)
+        {
+            var manager = new RedisManagerPool($"{Config.DOCKER_MACHINE_IP}:6379");
+            using (var client = manager.GetClient())
+            {
+                return client.Get<User>(userId);
             }
         }
     }

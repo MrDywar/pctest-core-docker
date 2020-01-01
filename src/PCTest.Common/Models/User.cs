@@ -15,5 +15,18 @@ namespace PCTestCommon.Models
 
         [ProtoMember(3)]
         public int Age { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            return obj is User user &&
+                   Id == user.Id &&
+                   Name == user.Name &&
+                   Age == user.Age;
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
     }
 }

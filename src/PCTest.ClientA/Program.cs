@@ -122,7 +122,7 @@ namespace PCTestClientA
             var manager = new RedisManagerPool($"{Config.DOCKER_MACHINE_IP}:6379");
             using (var client = manager.GetClient())
             {
-                client.Set("foo", user);
+                client.Set(user.Id.ToString(), user);
             }
         }
 
@@ -132,7 +132,7 @@ namespace PCTestClientA
             {
                 c.OnSerialize = PCTestCommon.Serializer.JsonSerializer;
 
-                c.Publish("foo", user);
+                c.Publish("users", user);
             }
         }
     }
